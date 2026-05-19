@@ -189,7 +189,37 @@
 </div>
 
 <script>
-// JS added in later tasks
+let state = {};
+let activeTab = 'standings';
+
+function formatTeamName(filename) {
+  return filename
+    .replace(/\.png$/i, '')
+    .split('_')
+    .map(token => {
+      const up = token.toUpperCase();
+      if (up === 'FC' || up === 'AFC') return up;
+      return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+async function loadTeams() {
+  const res = await fetch('/logos-list');
+  const { files } = await res.json();
+  return files.map(filename => ({
+    id: filename.replace(/\.png$/i, ''),
+    name: formatTeamName(filename),
+    logoFile: filename,
+    strength: Math.floor(Math.random() * 10) + 1,
+    played: 0, won: 0, drawn: 0, lost: 0,
+    gf: 0, ga: 0, points: 0
+  }));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // init() wired in Task 6
+});
 </script>
 </body>
 </html>
