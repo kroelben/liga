@@ -309,6 +309,7 @@ function render() {
   if (activeTab === 'standings') renderStandings();
   else if (activeTab === 'fixtures') renderFixtures();
   else if (activeTab === 'results') renderResults();
+  else if (activeTab === 'stats') renderStats();
 }
 
 function getZone(rank) {
@@ -403,6 +404,39 @@ function renderStandings() {
       <div class="legend-item"><div class="legend-dot" style="background:#4a8fff"></div>Europa League (5–6)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Relegation (18–20)</div>
     </div>`;
+}
+
+function renderStats() {
+  const sorted = [...state.scorers].sort((a, b) => b.goals - a.goals);
+  const rows = sorted.map((scorer, i) => {
+    const team = state.teams.find(t => t.id === scorer.teamId);
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="col-player">${scorer.name}</td>
+        <td class="col-player">
+          <div class="team-cell">
+            <img class="team-logo" src="/logos/${team.logoFile}" alt="${team.name}">
+            <span style="color:#888;font-size:12px;">${team.name}</span>
+          </div>
+        </td>
+        <td class="goals-cell">${scorer.goals}</td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('tab-stats').innerHTML = `
+    <div class="section-label">Top Scorers</div>
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th class="col-player">Player</th>
+          <th class="col-player">Club</th>
+          <th>Goals</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
 function renderResults() {
