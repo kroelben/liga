@@ -217,6 +217,33 @@ async function loadTeams() {
   }));
 }
 
+function generateFixtures(teams) {
+  const ids = teams.map(t => t.id);
+  const n = ids.length; // 20
+  const rotate = ids.slice(1); // ids[0] is the fixed pivot
+  const firstHalf = [];
+
+  for (let round = 0; round < n - 1; round++) {
+    const circle = [ids[0], ...rotate];
+    for (let i = 0; i < n / 2; i++) {
+      firstHalf.push({
+        matchday: round + 1,
+        homeId: circle[i],
+        awayId: circle[n - 1 - i]
+      });
+    }
+    rotate.unshift(rotate.pop()); // rotate right
+  }
+
+  const secondHalf = firstHalf.map(f => ({
+    matchday: f.matchday + (n - 1),
+    homeId: f.awayId,
+    awayId: f.homeId
+  }));
+
+  return [...firstHalf, ...secondHalf];
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // init() wired in Task 6
 });
