@@ -244,9 +244,72 @@ function generateFixtures(teams) {
   return [...firstHalf, ...secondHalf];
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // init() wired in Task 6
-});
+function generateScorers(teams) {
+  const initials = 'ABCDEFGHJKLMNOPRSTV'.split('');
+  const surnames = [
+    'Hansen', 'Nielsen', 'Jensen', 'Pedersen', 'Andersen',
+    'Christensen', 'Larsen', 'Sørensen', 'Rasmussen', 'Petersen',
+    'Jørgensen', 'Madsen', 'Kristensen', 'Olsen', 'Thomsen',
+    'Poulsen', 'Johansen', 'Berg', 'Møller', 'Kjær'
+  ];
+  const scorers = [];
+  for (const team of teams) {
+    const count = 2 + Math.floor(Math.random() * 2); // 2 or 3 per team
+    for (let i = 0; i < count; i++) {
+      const initial = initials[Math.floor(Math.random() * initials.length)];
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      scorers.push({ name: `${initial}. ${surname}`, teamId: team.id, goals: 0 });
+    }
+  }
+  return scorers;
+}
+
+async function saveState() {
+  await fetch('/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(state)
+  });
+}
+
+async function init() {
+  const res = await fetch('/save');
+  if (res.ok) {
+    state = await res.json();
+  } else {
+    const teams = await loadTeams();
+    state = {
+      teams,
+      fixtures: generateFixtures(teams),
+      results: [],
+      scorers: generateScorers(teams),
+      currentMatchday: 0
+    };
+    await saveState();
+  }
+  render();
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.tab === tab)
+  );
+  document.querySelectorAll('.tab-content').forEach(el =>
+    el.classList.toggle('active', el.id === `tab-${tab}`)
+  );
+  render();
+}
+
+function render() {
+  document.getElementById('league-sub').textContent =
+    state.currentMatchday > 0
+      ? `Season 1 · Matchday ${state.currentMatchday} of 38`
+      : 'Season 1 · Pre-season';
+  // Tab renderers added in later tasks
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
