@@ -307,6 +307,7 @@ function render() {
       ? `Season 1 · Matchday ${state.currentMatchday} of 38`
       : 'Season 1 · Pre-season';
   if (activeTab === 'standings') renderStandings();
+  else if (activeTab === 'fixtures') renderFixtures();
 }
 
 function getZone(rank) {
@@ -401,6 +402,49 @@ function renderStandings() {
       <div class="legend-item"><div class="legend-dot" style="background:#4a8fff"></div>Europa League (5–6)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Relegation (18–20)</div>
     </div>`;
+}
+
+function renderFixtures() {
+  const allMatchdays = [...new Set(state.fixtures.map(f => f.matchday))].sort((a, b) => a - b);
+  const nextUnplayed = allMatchdays.find(md => md > state.currentMatchday) ?? allMatchdays[allMatchdays.length - 1];
+
+  function buildMatchdayHTML(matchday) {
+    const matches = state.fixtures.filter(f => f.matchday === matchday);
+    const isPast = matchday <= state.currentMatchday;
+    return `<div class="fixtures-grid">${matches.map(f => {
+      const home = state.teams.find(t => t.id === f.homeId);
+      const away = state.teams.find(t => t.id === f.awayId);
+      return `
+        <div class="fixture-card" style="${isPast ? 'opacity:0.45;' : ''}">
+          <div class="fixture-team">
+            <img class="team-logo" src="/logos/${home.logoFile}" alt="${home.name}">
+            <span class="fixture-team-name">${home.name}</span>
+          </div>
+          <span class="fixture-vs">vs</span>
+          <div class="fixture-team away">
+            <img class="team-logo" src="/logos/${away.logoFile}" alt="${away.name}">
+            <span class="fixture-team-name">${away.name}</span>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+
+  const options = allMatchdays.map(md =>
+    `<option value="${md}" ${md === nextUnplayed ? 'selected' : ''}>Matchday ${md}</option>`
+  ).join('');
+
+  document.getElementById('tab-fixtures').innerHTML = `
+    <div class="fixtures-controls">
+      <div class="section-label" style="margin:0">Matchday</div>
+      <select class="matchday-select" id="fixture-select" onchange="updateFixtureMatchday(this.value)">
+        ${options}
+      </select>
+    </div>
+    <div id="fixture-content">${buildMatchdayHTML(nextUnplayed)}</div>`;
+
+  window.updateFixtureMatchday = md => {
+    document.getElementById('fixture-content').innerHTML = buildMatchdayHTML(Number(md));
+  };
 }
 
 async function resetLeague() {
