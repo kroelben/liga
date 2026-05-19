@@ -308,6 +308,7 @@ function render() {
       : 'Season 1 · Pre-season';
   if (activeTab === 'standings') renderStandings();
   else if (activeTab === 'fixtures') renderFixtures();
+  else if (activeTab === 'results') renderResults();
 }
 
 function getZone(rank) {
@@ -402,6 +403,57 @@ function renderStandings() {
       <div class="legend-item"><div class="legend-dot" style="background:#4a8fff"></div>Europa League (5–6)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Relegation (18–20)</div>
     </div>`;
+}
+
+function renderResults() {
+  if (state.results.length === 0) {
+    document.getElementById('tab-results').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>No results yet. Simulate a matchday to see results here.</p>
+      </div>`;
+    return;
+  }
+
+  const matchdays = [...new Set(state.results.map(r => r.matchday))].sort((a, b) => b - a);
+  const latest = matchdays[0];
+
+  function buildResultsHTML(matchday) {
+    const matches = state.results.filter(r => r.matchday === matchday);
+    return `<div class="results-grid">${matches.map(r => {
+      const home = state.teams.find(t => t.id === r.homeId);
+      const away = state.teams.find(t => t.id === r.awayId);
+      return `
+        <div class="result-card">
+          <div class="result-team">
+            <img class="team-logo" src="/logos/${home.logoFile}" alt="${home.name}">
+            <span class="result-team-name">${home.name}</span>
+          </div>
+          <span class="result-score">${r.homeGoals}–${r.awayGoals}</span>
+          <div class="result-team away">
+            <img class="team-logo" src="/logos/${away.logoFile}" alt="${away.name}">
+            <span class="result-team-name">${away.name}</span>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+
+  const options = matchdays.map(md =>
+    `<option value="${md}" ${md === latest ? 'selected' : ''}>Matchday ${md}</option>`
+  ).join('');
+
+  document.getElementById('tab-results').innerHTML = `
+    <div class="results-controls">
+      <div class="section-label" style="margin:0">Matchday</div>
+      <select class="matchday-select" id="results-select" onchange="updateResultsMatchday(this.value)">
+        ${options}
+      </select>
+    </div>
+    <div id="results-content">${buildResultsHTML(latest)}</div>`;
+
+  window.updateResultsMatchday = md => {
+    document.getElementById('results-content').innerHTML = buildResultsHTML(Number(md));
+  };
 }
 
 function renderFixtures() {
