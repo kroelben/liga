@@ -534,7 +534,17 @@ function renderFixtures() {
 }
 
 async function resetLeague() {
-  // Implemented in full in Task 11
+  if (!confirm('Reset the league? All progress will be cleared.')) return;
+  const teams = await loadTeams();
+  state = {
+    teams,
+    fixtures: generateFixtures(teams),
+    results: [],
+    scorers: generateScorers(teams),
+    currentMatchday: 0
+  };
+  await saveState();
+  render();
 }
 
 document.addEventListener('DOMContentLoaded', () =>
