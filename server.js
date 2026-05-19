@@ -26,12 +26,19 @@ app.get('/logos-list', (req, res) => {
 
 app.get('/save', (req, res) => {
   if (!fs.existsSync(SAVE_FILE)) return res.status(404).json({ error: 'No save file' });
-  res.sendFile(SAVE_FILE);
+  res.sendFile(SAVE_FILE, err => {
+    if (err && !res.headersSent) res.status(500).json({ error: 'Could not read save file' });
+  });
 });
 
 app.post('/save', (req, res) => {
-  fs.writeFileSync(SAVE_FILE, JSON.stringify(req.body, null, 2));
-  res.json({ ok: true });
+  try {
+    fs.writeFileSync(SAVE_FILE, JSON.stringify(req.body, null, 2));
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Failed to write save file:', err);
+    res.status(500).json({ error: 'Could not write save file' });
+  }
 });
 
 app.listen(PORT, () => console.log(`League simulator running at http://localhost:${PORT}`));
