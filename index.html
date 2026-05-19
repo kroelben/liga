@@ -306,7 +306,101 @@ function render() {
     state.currentMatchday > 0
       ? `Season 1 · Matchday ${state.currentMatchday} of 38`
       : 'Season 1 · Pre-season';
-  // Tab renderers added in later tasks
+  if (activeTab === 'standings') renderStandings();
+}
+
+function getZone(rank) {
+  if (rank <= 4) return 'cl';
+  if (rank <= 6) return 'el';
+  if (rank >= 18) return 'rel';
+  return 'none';
+}
+
+function getForm(teamId) {
+  return state.results
+    .filter(r => r.homeId === teamId || r.awayId === teamId)
+    .sort((a, b) => b.matchday - a.matchday)
+    .slice(0, 5)
+    .map(r => {
+      const isHome = r.homeId === teamId;
+      const scored = isHome ? r.homeGoals : r.awayGoals;
+      const conceded = isHome ? r.awayGoals : r.homeGoals;
+      if (scored > conceded) return 'W';
+      if (scored < conceded) return 'L';
+      return 'D';
+    });
+}
+
+function renderFormBadges(teamId) {
+  const form = getForm(teamId);
+  let html = '';
+  for (let i = 0; i < 5; i++) {
+    const r = form[i];
+    html += r
+      ? `<span class="form-badge form-${r}">${r}</span>`
+      : `<span class="form-badge form-empty">·</span>`;
+  }
+  return `<div class="form-cell">${html}</div>`;
+}
+
+function renderStandings() {
+  const sorted = [...state.teams].sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
+    if (gdDiff !== 0) return gdDiff;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    return a.name.localeCompare(b.name);
+  });
+
+  const rows = sorted.map((team, i) => {
+    const rank = i + 1;
+    const zone = getZone(rank);
+    const gd = team.gf - team.ga;
+    const gdStr = gd > 0 ? `+${gd}` : `${gd}`;
+    const ptsClass = { cl: 'pts-cl', el: 'pts-el', rel: 'pts-rel', none: 'pts-mid' }[zone];
+    return `
+      <tr class="zone-${zone}">
+        <td><span class="rank-badge rank-${zone}">${rank}</span></td>
+        <td class="col-team">
+          <div class="team-cell">
+            <img class="team-logo" src="/logos/${team.logoFile}" alt="${team.name}">
+            <span class="team-name">${team.name}</span>
+          </div>
+        </td>
+        <td>${team.played}</td>
+        <td>${team.won}</td>
+        <td>${team.drawn}</td>
+        <td>${team.lost}</td>
+        <td>${team.gf}</td>
+        <td>${team.ga}</td>
+        <td>${gdStr}</td>
+        <td>${renderFormBadges(team.id)}</td>
+        <td class="${ptsClass}">${team.points}</td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('tab-standings').innerHTML = `
+    <div class="section-label">
+      ${state.currentMatchday > 0 ? `Matchday ${state.currentMatchday} of 38` : 'Pre-season'}
+    </div>
+    <table class="standings-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th class="col-team">Team</th>
+          <th>P</th><th>W</th><th>D</th><th>L</th>
+          <th>GF</th><th>GA</th><th>GD</th>
+          <th>Form</th>
+          <th>Pts</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="standings-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#4caf50"></div>Champions League (1–4)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4a8fff"></div>Europa League (5–6)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Relegation (18–20)</div>
+    </div>`;
 }
 
 async function resetLeague() {
