@@ -309,7 +309,16 @@ function render() {
   // Tab renderers added in later tasks
 }
 
-document.addEventListener('DOMContentLoaded', init);
+async function resetLeague() {
+  // Implemented in full in Task 11
+}
+
+document.addEventListener('DOMContentLoaded', () =>
+  init().catch(err => {
+    document.getElementById('league-sub').textContent = 'Failed to load';
+    console.error('Init failed:', err);
+  })
+);
 </script>
 </body>
 </html>
