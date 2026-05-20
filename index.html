@@ -269,11 +269,16 @@ function generateScorers(teams) {
 }
 
 async function saveState() {
-  await fetch('/save', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(state)
-  });
+  try {
+    const res = await fetch('/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    if (!res.ok) console.error('Save failed:', res.status);
+  } catch (err) {
+    console.error('Save failed:', err);
+  }
 }
 
 async function init() {
@@ -335,7 +340,8 @@ function getForm(teamId) {
       if (scored > conceded) return 'W';
       if (scored < conceded) return 'L';
       return 'D';
-    });
+    })
+    .reverse();
 }
 
 function renderFormBadges(teamId) {
@@ -539,16 +545,21 @@ function renderFixtures() {
 
 async function resetLeague() {
   if (!confirm('Reset the league? All progress will be cleared.')) return;
-  const teams = await loadTeams();
-  state = {
-    teams,
-    fixtures: generateFixtures(teams),
-    results: [],
-    scorers: generateScorers(teams),
-    currentMatchday: 0
-  };
-  await saveState();
-  render();
+  try {
+    const teams = await loadTeams();
+    state = {
+      teams,
+      fixtures: generateFixtures(teams),
+      results: [],
+      scorers: generateScorers(teams),
+      currentMatchday: 0
+    };
+    await saveState();
+    render();
+  } catch (err) {
+    console.error('Reset failed:', err);
+    alert('Reset failed. Is the server running?');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () =>
