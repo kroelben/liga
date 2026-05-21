@@ -261,9 +261,9 @@ async function saveState() {
 }
 
 async function init() {
-  const res = await fetch('/save');
-  if (res.ok) {
-    state = await res.json();
+  const saved = localStorage.getItem('magnes-liga');
+  if (saved) {
+    state = JSON.parse(saved);
   } else {
     const teams = await loadTeams();
     state = {
