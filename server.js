@@ -28,6 +28,10 @@ app.get('/teams', (req, res) => {
   res.sendFile(path.join(__dirname, 'teams.json'));
 });
 
+app.get('/teams.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'teams.json'));
+});
+
 app.get('/save', (req, res) => {
   if (!fs.existsSync(SAVE_FILE)) return res.status(404).json({ error: 'No save file' });
   res.sendFile(SAVE_FILE, err => {
