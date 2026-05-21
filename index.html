@@ -197,7 +197,7 @@ function esc(s) {
 }
 
 async function loadTeams() {
-  const res = await fetch('/teams');
+  const res = await fetch('./teams.json');
   const teams = await res.json();
   return teams.map(t => ({
     id: t.id,
