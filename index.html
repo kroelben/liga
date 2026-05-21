@@ -196,25 +196,13 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function formatTeamName(filename) {
-  return filename
-    .replace(/\.png$/i, '')
-    .split('_')
-    .map(token => {
-      const up = token.toUpperCase();
-      if (up === 'FC' || up === 'AFC') return up;
-      return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
-    })
-    .join(' ');
-}
-
 async function loadTeams() {
-  const res = await fetch('/logos-list');
-  const { files } = await res.json();
-  return files.map(filename => ({
-    id: filename.replace(/\.png$/i, ''),
-    name: formatTeamName(filename),
-    logoFile: filename,
+  const res = await fetch('/teams');
+  const teams = await res.json();
+  return teams.map(t => ({
+    id: t.id,
+    name: t.name,
+    logoFile: `${t.id}.png`,
     strength: Math.floor(Math.random() * 10) + 1,
     played: 0, won: 0, drawn: 0, lost: 0,
     gf: 0, ga: 0, points: 0

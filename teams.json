@@ -1,0 +1,22 @@
+[
+  { "name": "AFC 04 Rasby",   "id": "afc_04_rasby"  },
+  { "name": "Bladington FC",  "id": "bladington_fc" },
+  { "name": "Bounty City",    "id": "bounty_city"   },
+  { "name": "Kras FC",        "id": "kras_fc"       },
+  { "name": "Kluf FC",        "id": "kluf_fc"       },
+  { "name": "Klub FC",        "id": "klub_fc"       },
+  { "name": "Lasby",          "id": "lasby"         },
+  { "name": "Laste FC",       "id": "laste_fc"      },
+  { "name": "Litz",           "id": "litz"          },
+  { "name": "Lonsis",         "id": "lonsis"        },
+  { "name": "Midelby",        "id": "midelby"       },
+  { "name": "Minby",          "id": "minby"         },
+  { "name": "Nordic Town",    "id": "nordic_town"   },
+  { "name": "Planet City",    "id": "planet_city"   },
+  { "name": "Rochomb",        "id": "rochomb"       },
+  { "name": "Sansey FC",      "id": "sansey_fc"     },
+  { "name": "Sondiks",        "id": "sondiks"       },
+  { "name": "Stold FC",       "id": "stold_fc"      },
+  { "name": "Vather",         "id": "vather"        },
+  { "name": "Wising",         "id": "wising"        }
+]
