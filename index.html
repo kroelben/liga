@@ -257,16 +257,7 @@ function generateScorers(teams) {
 }
 
 async function saveState() {
-  try {
-    const res = await fetch('/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    });
-    if (!res.ok) console.error('Save failed:', res.status);
-  } catch (err) {
-    console.error('Save failed:', err);
-  }
+  localStorage.setItem('magnes-liga', JSON.stringify(state));
 }
 
 async function init() {
