@@ -611,9 +611,10 @@ function applyResult(fixture, homeGoals, awayGoals, events) {
   state.results.push({ matchday: fixture.matchday, homeId: fixture.homeId, awayId: fixture.awayId, homeGoals, awayGoals });
 }
 
-function simulateMatchday() {
+async function simulateMatchday() {
   const nextMatchday = state.currentMatchday + 1;
   if (nextMatchday > 38) return;
+  state.currentMatchday = nextMatchday;
   const fixtures = state.fixtures.filter(f => f.matchday === nextMatchday);
   const matchResults = [];
   for (const fixture of fixtures) {
@@ -625,8 +626,7 @@ function simulateMatchday() {
     applyResult(fixture, homeGoals, awayGoals, events);
     matchResults.push({ fixture, homeGoals, awayGoals, events });
   }
-  state.currentMatchday = nextMatchday;
-  saveState();
+  await saveState();
   render();
   openMatchdayModal(matchResults);
 }
