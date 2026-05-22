@@ -6,6 +6,7 @@ const app = express();
 const PORT = 3000;
 const SAVE_FILE = path.join(__dirname, 'save.json');
 const LOGOS_DIR = path.join(__dirname, 'logos');
+const SHIRTS_DIR = path.join(__dirname, 'shirts');
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -14,6 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/logos', express.static(LOGOS_DIR));
+app.use('/shirts', express.static(SHIRTS_DIR));
 
 app.get('/logos-list', (req, res) => {
   try {
