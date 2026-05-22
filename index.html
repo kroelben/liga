@@ -173,6 +173,56 @@
   .empty-state { text-align: center; padding: 60px 20px; color: #444; }
   .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
   .empty-state p { font-size: 14px; }
+
+  /* ── Matchday Modal ── */
+  #md-modal {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.88);
+  }
+  #md-card {
+    width: 100%; max-width: 100%; height: 100dvh;
+    background: #13131e;
+    display: flex; flex-direction: column;
+    padding: 32px 28px 28px;
+    overflow: hidden;
+  }
+  #md-header {
+    text-align: center; font-size: 11px; color: #444;
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 28px;
+    flex-shrink: 0;
+  }
+  #md-teams {
+    display: flex; justify-content: center; align-items: flex-end;
+    gap: 24px; margin-bottom: 28px; flex-shrink: 0;
+  }
+  .md-team { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .md-shirt { height: 130px; width: auto; object-fit: contain; }
+  .md-team-name { font-size: 13px; font-weight: 600; color: #ccc; text-align: center; }
+  .md-score { font-size: 48px; font-weight: 800; color: #fff; line-height: 1; }
+  #md-sep { font-size: 26px; font-weight: 700; color: #333; padding-bottom: 54px; flex-shrink: 0; }
+  #md-event-zone {
+    flex: 1; background: #0d0d18; border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; margin-bottom: 24px; padding: 22px; text-align: center;
+  }
+  #md-event-icon { font-size: 44px; min-height: 52px; }
+  #md-event-label { font-size: 18px; font-weight: 700; color: #e8c84a; min-height: 26px; }
+  #md-event-detail { font-size: 13px; color: #aaa; min-height: 20px; }
+  #md-primary-btn {
+    width: 100%; padding: 20px;
+    background: #e8c84a; color: #000;
+    font-weight: 700; font-size: 16px;
+    border: none; border-radius: 12px; cursor: pointer;
+    font-family: inherit; margin-bottom: 12px; flex-shrink: 0;
+  }
+  #md-primary-btn:disabled { background: #1e1e2a; color: #333; cursor: default; }
+  #md-skip-btn {
+    width: 100%; padding: 14px;
+    background: transparent; color: #444; font-size: 13px;
+    border: 1px solid #1e1e2a; border-radius: 12px; cursor: pointer;
+    font-family: inherit; flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -657,5 +707,31 @@ document.addEventListener('DOMContentLoaded', () =>
   })
 );
 </script>
+
+<div id="md-modal" style="display:none">
+  <div id="md-card">
+    <div id="md-header"></div>
+    <div id="md-teams">
+      <div class="md-team">
+        <img id="md-home-shirt" class="md-shirt" src="" alt="">
+        <span id="md-home-name" class="md-team-name"></span>
+        <span id="md-home-score" class="md-score">0</span>
+      </div>
+      <div id="md-sep">–</div>
+      <div class="md-team">
+        <img id="md-away-shirt" class="md-shirt" src="" alt="">
+        <span id="md-away-name" class="md-team-name"></span>
+        <span id="md-away-score" class="md-score">0</span>
+      </div>
+    </div>
+    <div id="md-event-zone">
+      <div id="md-event-icon"></div>
+      <div id="md-event-label"></div>
+      <div id="md-event-detail"></div>
+    </div>
+    <button id="md-primary-btn" onclick="mdPrimaryAction()"></button>
+    <button id="md-skip-btn" onclick="mdSkip()" style="display:none">Skip to result</button>
+  </div>
+</div>
 </body>
 </html>
