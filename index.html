@@ -38,6 +38,19 @@
     transition: border-color 0.15s, color 0.15s;
   }
   .reset-btn:hover { border-color: #e8c84a; color: #e8c84a; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .simulate-btn {
+    padding: 10px 20px;
+    background: #e8c84a;
+    border: none;
+    color: #000;
+    font-size: 12px; font-family: inherit; font-weight: 700;
+    border-radius: 4px; cursor: pointer;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+  .simulate-btn:hover:not(:disabled) { background: #f0d55a; }
+  .simulate-btn:disabled { background: #1e1e2a; color: #444; cursor: default; }
 
   /* ── Tabs ── */
   .tabs { display: flex; border-bottom: 1px solid #1e1e2a; margin-bottom: 28px; }
@@ -172,7 +185,10 @@
         <div id="league-sub" class="league-sub">Loading...</div>
       </div>
     </div>
-    <button class="reset-btn" onclick="resetLeague()">↺ Reset League</button>
+    <div class="header-right">
+      <button id="simulate-btn" class="simulate-btn" onclick="simulateMatchday()">Simulate matchday 1</button>
+      <button class="reset-btn" onclick="resetLeague()">↺ Reset</button>
+    </div>
   </div>
 
   <div class="tabs">
@@ -307,6 +323,12 @@ function render() {
     state.currentMatchday > 0
       ? `Season 1 · Matchday ${state.currentMatchday} of 38`
       : 'Season 1 · Pre-season';
+  const simBtn = document.getElementById('simulate-btn');
+  if (simBtn) {
+    const next = state.currentMatchday + 1;
+    simBtn.textContent = next <= 38 ? `Simulate matchday ${next}` : 'Season complete';
+    simBtn.disabled = state.currentMatchday >= 38;
+  }
   if (activeTab === 'standings') renderStandings();
   else if (activeTab === 'fixtures') renderFixtures();
   else if (activeTab === 'results') renderResults();
