@@ -557,6 +557,80 @@ function renderFixtures() {
   };
 }
 
+function computeGoals(attackStr, defStr, isHome) {
+  const base = (attackStr / (attackStr + defStr)) * (isHome ? 2.2 : 1.8);
+  const raw = Math.floor(base + Math.random() * 3);
+  return Math.min(5, Math.max(0, raw));
+}
+
+function randomScorer(teamId) {
+  const pool = state.scorers.filter(s => s.teamId === teamId);
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)].name;
+}
+
+function generateEvents(fixture, homeGoals, awayGoals) {
+  const events = [];
+  const usedMinutes = new Set();
+  function randMinute() {
+    let m;
+    do { m = 1 + Math.floor(Math.random() * 90); } while (usedMinutes.has(m));
+    usedMinutes.add(m);
+    return m;
+  }
+  for (let i = 0; i < homeGoals; i++)
+    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.homeId, playerName: randomScorer(fixture.homeId) });
+  for (let i = 0; i < awayGoals; i++)
+    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.awayId, playerName: randomScorer(fixture.awayId) });
+  const chanceCount = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < chanceCount; i++)
+    events.push({ minute: randMinute(), type: 'chance', teamId: Math.random() < 0.5 ? fixture.homeId : fixture.awayId, playerName: null });
+  const cardCount = Math.floor(Math.random() * 3);
+  for (let i = 0; i < cardCount; i++) {
+    const cardTeam = Math.random() < 0.5 ? fixture.homeId : fixture.awayId;
+    events.push({ minute: randMinute(), type: 'yellow', teamId: cardTeam, playerName: randomScorer(cardTeam) });
+  }
+  return events.sort((a, b) => a.minute - b.minute);
+}
+
+function applyResult(fixture, homeGoals, awayGoals, events) {
+  const home = state.teams.find(t => t.id === fixture.homeId);
+  const away = state.teams.find(t => t.id === fixture.awayId);
+  home.played++; away.played++;
+  home.gf += homeGoals; home.ga += awayGoals;
+  away.gf += awayGoals; away.ga += homeGoals;
+  if (homeGoals > awayGoals) { home.won++; home.points += 3; away.lost++; }
+  else if (homeGoals < awayGoals) { away.won++; away.points += 3; home.lost++; }
+  else { home.drawn++; home.points++; away.drawn++; away.points++; }
+  for (const ev of events) {
+    if (ev.type === 'goal' && ev.playerName) {
+      const scorer = state.scorers.find(s => s.teamId === ev.teamId && s.name === ev.playerName);
+      if (scorer) scorer.goals++;
+    }
+  }
+  state.results.push({ matchday: fixture.matchday, homeId: fixture.homeId, awayId: fixture.awayId, homeGoals, awayGoals });
+}
+
+function simulateMatchday() {
+  const nextMatchday = state.currentMatchday + 1;
+  if (nextMatchday > 38) return;
+  const fixtures = state.fixtures.filter(f => f.matchday === nextMatchday);
+  const matchResults = [];
+  for (const fixture of fixtures) {
+    const home = state.teams.find(t => t.id === fixture.homeId);
+    const away = state.teams.find(t => t.id === fixture.awayId);
+    const homeGoals = computeGoals(home.strength, away.strength, true);
+    const awayGoals = computeGoals(away.strength, home.strength, false);
+    const events = generateEvents(fixture, homeGoals, awayGoals);
+    applyResult(fixture, homeGoals, awayGoals, events);
+    matchResults.push({ fixture, homeGoals, awayGoals, events });
+  }
+  state.currentMatchday = nextMatchday;
+  saveState();
+  render();
+  openMatchdayModal(matchResults);
+}
+
 async function resetLeague() {
   if (!confirm('Reset the league? All progress will be cleared.')) return;
   try {
