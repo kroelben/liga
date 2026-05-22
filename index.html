@@ -681,6 +681,115 @@ async function simulateMatchday() {
   openMatchdayModal(matchResults);
 }
 
+let mdState = null;
+
+function openMatchdayModal(matchResults) {
+  mdState = { matchResults, matchIndex: 0, eventTimer: null, pendingKickoff: true };
+  document.getElementById('md-modal').style.display = 'flex';
+  showMatch(0);
+}
+
+function showMatch(index) {
+  const { matchResults } = mdState;
+  const { fixture, homeGoals, awayGoals } = matchResults[index];
+  const home = state.teams.find(t => t.id === fixture.homeId);
+  const away = state.teams.find(t => t.id === fixture.awayId);
+  document.getElementById('md-header').textContent =
+    `Matchday ${state.currentMatchday} · ${index + 1}/${matchResults.length}`;
+  document.getElementById('md-home-shirt').src = `/shirts/${fixture.homeId}.png`;
+  document.getElementById('md-home-shirt').alt = home.name;
+  document.getElementById('md-away-shirt').src = `/shirts/${fixture.awayId}.png`;
+  document.getElementById('md-away-shirt').alt = away.name;
+  document.getElementById('md-home-name').textContent = home.name;
+  document.getElementById('md-away-name').textContent = away.name;
+  document.getElementById('md-home-score').textContent = '0';
+  document.getElementById('md-away-score').textContent = '0';
+  mdClearEvent();
+  document.getElementById('md-skip-btn').style.display = 'none';
+  document.getElementById('md-primary-btn').textContent = 'Kick off →';
+  document.getElementById('md-primary-btn').disabled = false;
+  mdState.matchIndex = index;
+  mdState.pendingKickoff = true;
+}
+
+function mdPrimaryAction() {
+  if (mdState.pendingKickoff) {
+    mdState.pendingKickoff = false;
+    document.getElementById('md-primary-btn').disabled = true;
+    document.getElementById('md-skip-btn').style.display = 'block';
+    playEvents(mdState.matchResults[mdState.matchIndex].events,
+               mdState.matchResults[mdState.matchIndex].fixture);
+  } else {
+    const next = mdState.matchIndex + 1;
+    if (next < mdState.matchResults.length) {
+      showMatch(next);
+    } else {
+      mdClose();
+    }
+  }
+}
+
+function playEvents(events, fixture) {
+  let homeScore = 0, awayScore = 0, i = 0;
+  function tick() {
+    if (i >= events.length) {
+      document.getElementById('md-skip-btn').style.display = 'none';
+      const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
+      document.getElementById('md-primary-btn').textContent = isLast ? 'Close' : 'Next match →';
+      document.getElementById('md-primary-btn').disabled = false;
+      mdState.eventTimer = null;
+      return;
+    }
+    const ev = events[i++];
+    if (ev.type === 'goal') {
+      if (ev.teamId === fixture.homeId) {
+        homeScore++;
+        document.getElementById('md-home-score').textContent = homeScore;
+      } else {
+        awayScore++;
+        document.getElementById('md-away-score').textContent = awayScore;
+      }
+      mdShowEvent('⚽', 'GOAL!', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
+    } else if (ev.type === 'chance') {
+      mdShowEvent('💨', 'Close chance!', `${ev.minute}'`);
+    } else if (ev.type === 'yellow') {
+      mdShowEvent('💛', 'Yellow card', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
+    }
+    mdState.eventTimer = setTimeout(tick, 600);
+  }
+  tick();
+}
+
+function mdSkip() {
+  if (mdState.eventTimer) { clearTimeout(mdState.eventTimer); mdState.eventTimer = null; }
+  const { fixture, homeGoals, awayGoals } = mdState.matchResults[mdState.matchIndex];
+  document.getElementById('md-home-score').textContent = homeGoals;
+  document.getElementById('md-away-score').textContent = awayGoals;
+  mdClearEvent();
+  document.getElementById('md-skip-btn').style.display = 'none';
+  const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
+  document.getElementById('md-primary-btn').textContent = isLast ? 'Close' : 'Next match →';
+  document.getElementById('md-primary-btn').disabled = false;
+}
+
+function mdShowEvent(icon, label, detail) {
+  document.getElementById('md-event-icon').textContent = icon;
+  document.getElementById('md-event-label').textContent = label;
+  document.getElementById('md-event-detail').textContent = detail;
+}
+
+function mdClearEvent() {
+  document.getElementById('md-event-icon').textContent = '';
+  document.getElementById('md-event-label').textContent = '';
+  document.getElementById('md-event-detail').textContent = '';
+}
+
+function mdClose() {
+  if (mdState && mdState.eventTimer) clearTimeout(mdState.eventTimer);
+  mdState = null;
+  document.getElementById('md-modal').style.display = 'none';
+}
+
 async function resetLeague() {
   if (!confirm('Reset the league? All progress will be cleared.')) return;
   try {
