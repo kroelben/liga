@@ -796,6 +796,7 @@ function mdClose() {
 }
 
 async function resetLeague() {
+  if (mdState) mdClose();
   if (!confirm('Reset the league? All progress will be cleared.')) return;
   try {
     const teams = await loadTeams();
