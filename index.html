@@ -685,13 +685,15 @@ let mdState = null;
 
 function openMatchdayModal(matchResults) {
   mdState = { matchResults, matchIndex: 0, eventTimer: null, pendingKickoff: true };
+  const simBtn = document.getElementById('simulate-btn');
+  if (simBtn) simBtn.disabled = true;
   document.getElementById('md-modal').style.display = 'flex';
   showMatch(0);
 }
 
 function showMatch(index) {
   const { matchResults } = mdState;
-  const { fixture, homeGoals, awayGoals } = matchResults[index];
+  const { fixture } = matchResults[index];
   const home = state.teams.find(t => t.id === fixture.homeId);
   const away = state.teams.find(t => t.id === fixture.awayId);
   document.getElementById('md-header').textContent =
@@ -732,6 +734,7 @@ function mdPrimaryAction() {
 function playEvents(events, fixture) {
   let homeScore = 0, awayScore = 0, i = 0;
   function tick() {
+    if (!mdState) return;
     if (i >= events.length) {
       document.getElementById('md-skip-btn').style.display = 'none';
       const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
@@ -788,6 +791,8 @@ function mdClose() {
   if (mdState && mdState.eventTimer) clearTimeout(mdState.eventTimer);
   mdState = null;
   document.getElementById('md-modal').style.display = 'none';
+  const simBtn = document.getElementById('simulate-btn');
+  if (simBtn) simBtn.disabled = state.currentMatchday >= 38;
 }
 
 async function resetLeague() {
