@@ -246,6 +246,7 @@
     font-size: 20px; line-height: 1; cursor: pointer;
     padding: 4px 8px; border-radius: 6px; font-family: inherit;
   }
+  #tp-dismiss:hover { color: #ccc; background: #1e1e2a; }
   #tp-header { display: flex; align-items: center; gap: 14px; }
   #tp-logo { width: 48px; height: 48px; object-fit: contain; }
   #tp-name { font-size: 20px; font-weight: 700; color: #fff; }
@@ -1077,10 +1078,12 @@ function closeTeamModal() {
   document.getElementById('tp-modal').style.display = 'none';
 }
 
+const NUMERIC_TEAM_FIELDS = new Set(['capacity', 'forsvar', 'kontrol', 'angreb']);
+
 function teamModalSave(field, value) {
   if (!tpTeamId) return;
   const team = state.teams.find(t => t.id === tpTeamId);
-  team[field] = value;
+  team[field] = NUMERIC_TEAM_FIELDS.has(field) ? (value === '' ? '' : Number(value)) : value;
   saveState();
 }
 
@@ -1138,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () =>
   </div>
 </div>
 
-<div id="tp-modal" style="display:none">
+<div id="tp-modal" style="display:none" onclick="if(event.target===this)closeTeamModal()">
   <div id="tp-card">
     <button id="tp-dismiss" onclick="closeTeamModal()">×</button>
     <div id="tp-header">
