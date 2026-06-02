@@ -245,8 +245,8 @@
       </div>
     </div>
     <div class="header-right">
-      <button id="simulate-btn" class="simulate-btn" onclick="simulateMatchday()">Simulate matchday 1</button>
-      <button class="reset-btn" onclick="resetLeague()">↺ Reset</button>
+      <button id="simulate-btn" class="simulate-btn" onclick="simulateMatchday()">Simuler runde 1</button>
+      <button class="reset-btn" onclick="resetLeague()">↺ Nulstil</button>
     </div>
   </div>
 
@@ -472,16 +472,16 @@ function switchTab(tab) {
 function render() {
   document.getElementById('league-sub').textContent =
     state.currentMatchday > 0
-      ? `Season 1 · Matchday ${state.currentMatchday} of 38`
-      : 'Season 1 · Pre-season';
+      ? `Sæson 1 · Runde ${state.currentMatchday} af 38`
+      : 'Sæson 1 · Før sæsonen';
   const simBtn = document.getElementById('simulate-btn');
   if (simBtn) {
     if (mdState) {
-      simBtn.textContent = `Resume matchday ${state.currentMatchday}`;
+      simBtn.textContent = `Fortsæt runde ${state.currentMatchday}`;
       simBtn.disabled = false;
     } else {
       const next = state.currentMatchday + 1;
-      simBtn.textContent = next <= 38 ? `Simulate matchday ${next}` : 'Season complete';
+      simBtn.textContent = next <= 38 ? `Simuler runde ${next}` : 'Sæson afsluttet';
       simBtn.disabled = state.currentMatchday >= 38;
     }
   }
@@ -526,21 +526,17 @@ function renderFormBadges(teamId) {
   return `<div class="form-cell">${html}</div>`;
 }
 
-function renderStandings() {
-  const sorted = [...state.teams].sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
-    if (gdDiff !== 0) return gdDiff;
-    if (b.gf !== a.gf) return b.gf - a.gf;
-    return a.name.localeCompare(b.name);
-  });
-
-  const rows = sorted.map((team, i) => {
+function standingsTableHTML(rankedTeams, showForm) {
+  const rows = rankedTeams.map((team, i) => {
     const rank = i + 1;
     const zone = getZone(rank);
     const gd = team.gf - team.ga;
     const gdStr = gd > 0 ? `+${gd}` : `${gd}`;
     const ptsClass = { cl: 'pts-cl', el: 'pts-el', rel: 'pts-rel', none: 'pts-mid' }[zone];
+    const maal = `${team.gf} - ${team.ga}`;
+    const formCell = showForm
+      ? `<td>${renderFormBadges(team.id)}</td>`
+      : `<td></td>`;
     return `
       <tr class="zone-${zone}">
         <td><span class="rank-badge rank-${zone}">${rank}</span></td>
@@ -554,35 +550,47 @@ function renderStandings() {
         <td>${team.won}</td>
         <td>${team.drawn}</td>
         <td>${team.lost}</td>
-        <td>${team.gf}</td>
-        <td>${team.ga}</td>
+        <td>${maal}</td>
         <td>${gdStr}</td>
-        <td>${renderFormBadges(team.id)}</td>
+        ${formCell}
         <td class="${ptsClass}">${team.points}</td>
       </tr>`;
   }).join('');
 
-  document.getElementById('tab-standings').innerHTML = `
-    <div class="section-label">
-      ${state.currentMatchday > 0 ? `Matchday ${state.currentMatchday} of 38` : 'Pre-season'}
-    </div>
+  return `
     <table class="standings-table">
       <thead>
         <tr>
           <th style="width:32px;">#</th>
-          <th class="col-team">Team</th>
-          <th>P</th><th>W</th><th>D</th><th>L</th>
-          <th>GF</th><th>GA</th><th>GD</th>
+          <th class="col-team">Hold</th>
+          <th>K</th><th>V</th><th>U</th><th>T</th>
+          <th>MÅL</th><th>DIFF</th>
           <th>Form</th>
-          <th>Pts</th>
+          <th>P</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
-    </table>
+    </table>`;
+}
+
+function renderStandings() {
+  const sorted = [...state.teams].sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
+    if (gdDiff !== 0) return gdDiff;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    return a.name.localeCompare(b.name);
+  });
+
+  document.getElementById('tab-standings').innerHTML = `
+    <div class="section-label">
+      ${state.currentMatchday > 0 ? `Runde ${state.currentMatchday} af 38` : 'Før sæsonen'}
+    </div>
+    ${standingsTableHTML(sorted, true)}
     <div class="standings-legend">
       <div class="legend-item"><div class="legend-dot" style="background:#4caf50"></div>Champions League (1–4)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#4a8fff"></div>Europa League (5–6)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Relegation (18–20)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff5252"></div>Nedrykning (18–20)</div>
     </div>`;
 }
 
@@ -605,14 +613,14 @@ function renderStats() {
   }).join('');
 
   document.getElementById('tab-stats').innerHTML = `
-    <div class="section-label">Top Scorers</div>
+    <div class="section-label">Topscorere</div>
     <table class="stats-table">
       <thead>
         <tr>
           <th style="width:32px;">#</th>
-          <th class="col-player">Player</th>
-          <th class="col-player">Club</th>
-          <th>Goals</th>
+          <th class="col-player">Spiller</th>
+          <th class="col-player">Klub</th>
+          <th>Mål</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -624,7 +632,7 @@ function renderResults() {
     document.getElementById('tab-results').innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">📋</div>
-        <p>No results yet. Simulate a matchday to see results here.</p>
+        <p>Ingen resultater endnu. Simuler en runde for at se resultater her.</p>
       </div>`;
     return;
   }
@@ -653,12 +661,12 @@ function renderResults() {
   }
 
   const options = matchdays.map(md =>
-    `<option value="${md}" ${md === latest ? 'selected' : ''}>Matchday ${md}</option>`
+    `<option value="${md}" ${md === latest ? 'selected' : ''}>Runde ${md}</option>`
   ).join('');
 
   document.getElementById('tab-results').innerHTML = `
     <div class="results-controls">
-      <div class="section-label" style="margin:0">Matchday</div>
+      <div class="section-label" style="margin:0">Runde</div>
       <select class="matchday-select" id="results-select" onchange="updateResultsMatchday(this.value)">
         ${options}
       </select>
@@ -696,12 +704,12 @@ function renderFixtures() {
   }
 
   const options = allMatchdays.map(md =>
-    `<option value="${md}" ${md === nextUnplayed ? 'selected' : ''}>Matchday ${md}</option>`
+    `<option value="${md}" ${md === nextUnplayed ? 'selected' : ''}>Runde ${md}</option>`
   ).join('');
 
   document.getElementById('tab-fixtures').innerHTML = `
     <div class="fixtures-controls">
-      <div class="section-label" style="margin:0">Matchday</div>
+      <div class="section-label" style="margin:0">Runde</div>
       <select class="matchday-select" id="fixture-select" onchange="updateFixtureMatchday(this.value)">
         ${options}
       </select>
@@ -820,7 +828,7 @@ function showMatch(index) {
   const home = state.teams.find(t => t.id === fixture.homeId);
   const away = state.teams.find(t => t.id === fixture.awayId);
   document.getElementById('md-header').textContent =
-    `Matchday ${state.currentMatchday} · ${index + 1}/${matchResults.length}`;
+    `Runde ${state.currentMatchday} · ${index + 1}/${matchResults.length}`;
   document.getElementById('md-home-shirt').src = `/shirts/${fixture.homeId}.png`;
   document.getElementById('md-home-shirt').alt = home.name;
   document.getElementById('md-away-shirt').src = `/shirts/${fixture.awayId}.png`;
@@ -831,7 +839,7 @@ function showMatch(index) {
   document.getElementById('md-away-score').textContent = '0';
   mdClearEvent();
   document.getElementById('md-skip-btn').style.display = 'none';
-  document.getElementById('md-primary-btn').textContent = 'Kick off →';
+  document.getElementById('md-primary-btn').textContent = 'Spark af →';
   document.getElementById('md-primary-btn').disabled = false;
   mdState.matchIndex = index;
   mdState.pendingKickoff = true;
@@ -861,7 +869,7 @@ function playEvents(events, fixture) {
     if (i >= events.length) {
       document.getElementById('md-skip-btn').style.display = 'none';
       const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
-      document.getElementById('md-primary-btn').textContent = isLast ? 'Close' : 'Next match →';
+      document.getElementById('md-primary-btn').textContent = isLast ? 'Luk' : 'Næste kamp →';
       document.getElementById('md-primary-btn').disabled = false;
       mdState.eventTimer = null;
       return;
@@ -875,11 +883,11 @@ function playEvents(events, fixture) {
         awayScore++;
         document.getElementById('md-away-score').textContent = awayScore;
       }
-      mdShowEvent('⚽', 'GOAL!', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
+      mdShowEvent('⚽', 'MÅL!', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
     } else if (ev.type === 'chance') {
-      mdShowEvent('💨', 'Close chance!', `${ev.minute}'`);
+      mdShowEvent('💨', 'Stor chance!', `${ev.minute}'`);
     } else if (ev.type === 'yellow') {
-      mdShowEvent('💛', 'Yellow card', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
+      mdShowEvent('💛', 'Gult kort', ev.playerName ? `${ev.playerName} · ${ev.minute}'` : `${ev.minute}'`);
     }
     mdState.eventTimer = setTimeout(tick, 600);
   }
@@ -894,7 +902,7 @@ function mdSkip() {
   mdClearEvent();
   document.getElementById('md-skip-btn').style.display = 'none';
   const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
-  document.getElementById('md-primary-btn').textContent = isLast ? 'Close' : 'Next match →';
+  document.getElementById('md-primary-btn').textContent = isLast ? 'Luk' : 'Næste kamp →';
   document.getElementById('md-primary-btn').disabled = false;
 }
 
@@ -932,7 +940,7 @@ function mdResume() {
 
 async function resetLeague() {
   if (mdState) mdClose();
-  if (!confirm('Reset the league? All progress will be cleared.')) return;
+  if (!confirm('Nulstil ligaen? Al fremgang slettes.')) return;
   try {
     const teams = await loadTeams();
     state = {
@@ -981,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () =>
       <div id="md-event-detail"></div>
     </div>
     <button id="md-primary-btn" onclick="mdPrimaryAction()"></button>
-    <button id="md-skip-btn" onclick="mdSkip()" style="display:none">Skip to result</button>
+    <button id="md-skip-btn" onclick="mdSkip()" style="display:none">Spring til resultat</button>
   </div>
 </div>
 </body>
