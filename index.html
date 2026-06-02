@@ -312,6 +312,7 @@
 <script>
 let state = {};
 let activeTab = 'stilling';
+let tpTeamId = null;
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -1052,6 +1053,34 @@ function mdResume() {
   if (!mdState) return;
   document.getElementById('md-modal').style.display = 'flex';
   render();
+}
+
+function openTeamModal(teamId) {
+  const team = state.teams.find(t => t.id === teamId);
+  tpTeamId = teamId;
+  document.getElementById('tp-logo').src = `./logos/${team.logoFile}`;
+  document.getElementById('tp-logo').alt = team.name;
+  document.getElementById('tp-name').textContent = team.name;
+  document.getElementById('tp-shirt').src = `/shirts/${team.id}.png`;
+  document.getElementById('tp-shirt').alt = team.name;
+  document.getElementById('tp-stadium').value = team.stadiumName ?? '';
+  document.getElementById('tp-capacity').value = team.capacity ?? '';
+  document.getElementById('tp-forsvar').value = team.forsvar ?? '';
+  document.getElementById('tp-kontrol').value = team.kontrol ?? '';
+  document.getElementById('tp-angreb').value = team.angreb ?? '';
+  document.getElementById('tp-modal').style.display = 'flex';
+}
+
+function closeTeamModal() {
+  tpTeamId = null;
+  document.getElementById('tp-modal').style.display = 'none';
+}
+
+function teamModalSave(field, value) {
+  if (!tpTeamId) return;
+  const team = state.teams.find(t => t.id === tpTeamId);
+  team[field] = value;
+  saveState();
 }
 
 async function resetLeague() {
