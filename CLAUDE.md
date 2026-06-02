@@ -4,7 +4,9 @@ Local football league simulator. Single Express server + single-file frontend.
 
 ## Working with this project
 
-After finishing any task, update this file to reflect the current state of the project — files, backlog, anything that changed.
+After finishing any task, update this file if files or state shape changed. Backlog is tracked in `backlog.md`.
+
+After every task, commit and push.
 
 ## Start
 
@@ -39,11 +41,3 @@ npm start     # http://localhost:3000
 ## Name Formatting
 
 Team names are defined once in `teams.json`. Do not derive names from filenames.
-
-## Backlog
-
-- ~~**Simulate matchday** button: advance `currentMatchday`, generate results using team `strength` + randomness (0–5 goal range), update team stats, distribute goals to scorers, auto-save~~ ✓ Done — includes full-screen matchday modal with shirt display and animated match events
-- ~~**Have player names be European and somewhat international** — like names you would encounter in the Premier League~~ ✓ Done
-- ~~**Interface language/table should be Danish** — all UI text and table headers in Danish~~ ✓ Done
-- ~~**Have fixtures be more random** — so first team doesn't play the first half of games at home and as the first match~~ ✓ Done — assists field added to `scorers`
-- **Remote access**: make the app accessible from other devices on the network (e.g. iPad) — options include exposing the local Express server on the LAN, or hosting a static build on GitHub Pages with a custom domain subdirectory
