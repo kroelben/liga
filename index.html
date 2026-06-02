@@ -633,8 +633,44 @@ function renderStats() {
     </table>`;
 }
 
-function renderHjemme() {}
-function renderUde() {}
+function computeFilteredStandings(homeOrAway) {
+  return state.teams.map(team => {
+    const relevant = state.results.filter(r =>
+      homeOrAway === 'home' ? r.homeId === team.id : r.awayId === team.id
+    );
+    let played = 0, won = 0, drawn = 0, lost = 0, gf = 0, ga = 0, points = 0;
+    for (const r of relevant) {
+      const isHome = r.homeId === team.id;
+      const scored = isHome ? r.homeGoals : r.awayGoals;
+      const conceded = isHome ? r.awayGoals : r.homeGoals;
+      played++;
+      gf += scored; ga += conceded;
+      if (scored > conceded)      { won++;   points += 3; }
+      else if (scored === conceded){ drawn++; points += 1; }
+      else                         { lost++; }
+    }
+    return { ...team, played, won, drawn, lost, gf, ga, points };
+  }).sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
+    if (gdDiff !== 0) return gdDiff;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function renderHjemme() {
+  const sorted = computeFilteredStandings('home');
+  document.getElementById('tab-hjemme').innerHTML = `
+    <div class="section-label">Hjemmekampe</div>
+    ${standingsTableHTML(sorted, false)}`;
+}
+function renderUde() {
+  const sorted = computeFilteredStandings('away');
+  document.getElementById('tab-ude').innerHTML = `
+    <div class="section-label">Udekampe</div>
+    ${standingsTableHTML(sorted, false)}`;
+}
 function renderForm() {}
 function renderKampe() {}
 
