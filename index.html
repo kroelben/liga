@@ -226,6 +226,56 @@
     padding: 4px 8px; border-radius: 6px; font-family: inherit;
   }
   #md-dismiss-btn:hover { color: #ccc; background: #1e1e2a; }
+
+  /* ── Team Profile Modal ── */
+  #tp-modal {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.75);
+  }
+  #tp-card {
+    width: 420px; max-width: 92vw;
+    background: #13131e; border-radius: 16px;
+    display: flex; flex-direction: column;
+    padding: 24px 28px 28px; gap: 20px;
+    position: relative;
+  }
+  #tp-dismiss {
+    position: absolute; top: 14px; right: 16px;
+    background: transparent; border: none; color: #555;
+    font-size: 20px; line-height: 1; cursor: pointer;
+    padding: 4px 8px; border-radius: 6px; font-family: inherit;
+  }
+  #tp-header { display: flex; align-items: center; gap: 14px; }
+  #tp-logo { width: 48px; height: 48px; object-fit: contain; }
+  #tp-name { font-size: 20px; font-weight: 700; color: #fff; }
+  #tp-middle { display: flex; align-items: flex-start; gap: 20px; }
+  #tp-shirt { height: 110px; width: auto; object-fit: contain; flex-shrink: 0; }
+  #tp-info { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 0; }
+  .tp-field { display: flex; flex-direction: column; gap: 4px; }
+  .tp-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+  .tp-input {
+    width: 100%; background: #0d0d18; border: 1px solid #1e1e2a;
+    color: #e0e0e0; padding: 10px 12px; border-radius: 8px;
+    font-family: inherit; font-size: 14px;
+  }
+  .tp-input:focus { outline: none; border-color: #e8c84a; }
+  #tp-skills { display: flex; flex-direction: column; gap: 10px; }
+  .tp-section-label {
+    font-size: 11px; color: #444;
+    text-transform: uppercase; letter-spacing: 1.5px;
+  }
+  .tp-skills-row { display: flex; gap: 12px; }
+  .tp-skill { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  #tp-close {
+    width: 100%; padding: 14px;
+    background: #1e1e2a; color: #ccc;
+    font-weight: 600; font-size: 14px;
+    border: none; border-radius: 10px; cursor: pointer;
+    font-family: inherit;
+  }
+  .standings-table tbody tr { cursor: pointer; }
+  .standings-table tbody tr:hover { background: rgba(255,255,255,0.03); }
 </style>
 </head>
 <body>
