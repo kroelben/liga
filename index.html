@@ -1107,5 +1107,51 @@ document.addEventListener('DOMContentLoaded', () =>
     <button id="md-primary-btn" onclick="mdPrimaryAction()"></button>
   </div>
 </div>
+
+<div id="tp-modal" style="display:none">
+  <div id="tp-card">
+    <button id="tp-dismiss" onclick="closeTeamModal()">×</button>
+    <div id="tp-header">
+      <img id="tp-logo" src="" alt="">
+      <span id="tp-name"></span>
+    </div>
+    <div id="tp-middle">
+      <img id="tp-shirt" src="" alt="">
+      <div id="tp-info">
+        <div class="tp-field">
+          <div class="tp-label">Stadion</div>
+          <input class="tp-input" id="tp-stadium" type="text" placeholder="Stadion"
+            oninput="teamModalSave('stadiumName', this.value)">
+        </div>
+        <div class="tp-field">
+          <div class="tp-label">Kapacitet</div>
+          <input class="tp-input" id="tp-capacity" type="number" placeholder="Kapacitet"
+            oninput="teamModalSave('capacity', this.value)">
+        </div>
+      </div>
+    </div>
+    <div id="tp-skills">
+      <div class="tp-section-label">Kompetencer</div>
+      <div class="tp-skills-row">
+        <div class="tp-skill">
+          <div class="tp-label">Forsvar</div>
+          <input class="tp-input" id="tp-forsvar" type="number" min="1" max="100" placeholder="1–100"
+            oninput="teamModalSave('forsvar', this.value)">
+        </div>
+        <div class="tp-skill">
+          <div class="tp-label">Kontrol</div>
+          <input class="tp-input" id="tp-kontrol" type="number" min="1" max="100" placeholder="1–100"
+            oninput="teamModalSave('kontrol', this.value)">
+        </div>
+        <div class="tp-skill">
+          <div class="tp-label">Angreb</div>
+          <input class="tp-input" id="tp-angreb" type="number" min="1" max="100" placeholder="1–100"
+            oninput="teamModalSave('angreb', this.value)">
+        </div>
+      </div>
+    </div>
+    <button id="tp-close" onclick="closeTeamModal()">Luk</button>
+  </div>
+</div>
 </body>
 </html>
