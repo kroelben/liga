@@ -1057,6 +1057,7 @@ function mdResume() {
 
 function openTeamModal(teamId) {
   const team = state.teams.find(t => t.id === teamId);
+  if (!team) return;
   tpTeamId = teamId;
   document.getElementById('tp-logo').src = `./logos/${team.logoFile}`;
   document.getElementById('tp-logo').alt = team.name;
