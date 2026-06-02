@@ -1,0 +1,6 @@
+- ~~have player names be european and somewhat international - like you would encounter in premier league.~~ ✓ Done
+- ~~interface language/table should be Danish.~~ ✓ Done
+- ~~have fixtures be more random, so first team doesn't play the first half of games at home and as the first match.~~ ✓ Done
+- have teams have configurable skill; forsvar, kontrol, angreb
+- add a minute counter that counts a minute per half second, 2 seconds when an action happens. Add random extra time (1-5 minutes), where actions can also happen.
+- Actions should include; goal (max. 10 heavily skewed towards "normal" results), big chance, yellow card, red card (if red card gives a boost to other teams likelihood of scoring rest of game)

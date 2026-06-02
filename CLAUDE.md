@@ -31,7 +31,7 @@ npm start     # http://localhost:3000
   teams:    [{ id, name, logoFile, strength, played, won, drawn, lost, gf, ga, points }],
   fixtures: [{ matchday, homeId, awayId }],          // 380 total (38 × 10)
   results:  [{ matchday, homeId, awayId, homeGoals, awayGoals }],
-  scorers:  [{ name, teamId, goals }],               // ~50–60 total
+  scorers:  [{ name, teamId, goals, assists }],       // ~50–60 total
   currentMatchday: 0
 }
 ```
@@ -43,4 +43,7 @@ Team names are defined once in `teams.json`. Do not derive names from filenames.
 ## Backlog
 
 - ~~**Simulate matchday** button: advance `currentMatchday`, generate results using team `strength` + randomness (0–5 goal range), update team stats, distribute goals to scorers, auto-save~~ ✓ Done — includes full-screen matchday modal with shirt display and animated match events
+- ~~**Have player names be European and somewhat international** — like names you would encounter in the Premier League~~ ✓ Done
+- ~~**Interface language/table should be Danish** — all UI text and table headers in Danish~~ ✓ Done
+- ~~**Have fixtures be more random** — so first team doesn't play the first half of games at home and as the first match~~ ✓ Done — assists field added to `scorers`
 - **Remote access**: make the app accessible from other devices on the network (e.g. iPad) — options include exposing the local Express server on the LAN, or hosting a static build on GitHub Pages with a custom domain subdirectory
