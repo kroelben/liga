@@ -601,7 +601,20 @@ function renderStandings() {
 }
 
 function renderStats() {
-  const sorted = [...state.scorers].sort((a, b) => b.goals - a.goals);
+  const sorted = [...state.scorers].sort((a, b) => {
+    if (b.goals !== a.goals) return b.goals - a.goals;
+    return (b.assists ?? 0) - (a.assists ?? 0);
+  });
+
+  if (sorted.every(s => s.goals === 0)) {
+    document.getElementById('tab-statistik').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>Ingen resultater endnu. Simuler en runde for at se statistik her.</p>
+      </div>`;
+    return;
+  }
+
   const rows = sorted.map((scorer, i) => {
     const team = state.teams.find(t => t.id === scorer.teamId) ?? { logoFile: '', name: 'Unknown' };
     return `
@@ -615,6 +628,7 @@ function renderStats() {
           </div>
         </td>
         <td class="goals-cell">${scorer.goals}</td>
+        <td style="font-weight:600;color:#aaa;">${scorer.assists ?? 0}</td>
       </tr>`;
   }).join('');
 
@@ -627,6 +641,7 @@ function renderStats() {
           <th class="col-player">Spiller</th>
           <th class="col-player">Klub</th>
           <th>Mål</th>
+          <th>Assist</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
