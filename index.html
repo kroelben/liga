@@ -311,21 +311,103 @@ function generateFixtures(teams) {
   return [...firstHalf, ...secondHalf];
 }
 
+const FIRST_NAMES = [
+  // English
+  'James','Harry','Jack','George','Mason','Declan','Bukayo','Trent','Jordan','Marcus',
+  'Raheem','Phil','Aaron','Conor','Tommy','Luke','Oliver','Liam','Reece','Ben',
+  // French
+  'Kylian','Antoine','Ousmane','Théo','Aurélien','Tanguy','Jonathan','William','Adrien','Moussa',
+  'Cheick','Rayan','Ibrahima','Mamadou','Ferland','Axel','Christopher','Lucas','Mattéo','Wesley',
+  // Spanish
+  'Pedri','Gavi','Marcos','Pablo','Diego','Carlos','Álvaro','Rodrigo','Sergio','Mikel',
+  'Aymeric','Eric','Ander','Dani','Ferran','Joselu','Unai','Borja','Gerard','Yerlan',
+  // Portuguese
+  'Diogo','Rúben','Bernardo','João','Rafael','Nuno','Pedro','Tiago','André','Gonçalo',
+  'Bruno','Vitinha','Matheus','Renato','Otávio','Pepe','Ricardo','Florentino','Wendell','Domingos',
+  // Dutch
+  'Virgil','Memphis','Davy','Denzel','Stefan','Frenkie','Cody','Xavi','Tijjani','Jeremie',
+  'Ryan','Nathan','Donyell','Quilindschy','Jorrel','Brian','Guus','Wout','Lutsharel','Teun',
+  // German
+  'Leroy','Serge','Kai','Jamal','Thomas','Joshua','Niklas','Antonio','Benjamin','Marco',
+  'Timo','Florian','Robin','Leon','Luca','Jonas','Kevin','Lukas','Felix','David',
+  // Scandinavian
+  'Erling','Martin','Alexander','Christian','Victor','Andreas','Emil','Rasmus','Kasper','Mikkel',
+  'Daniel','Sebastian','Lasse','Mathias','Morten','Lars','Henrik','Nicolai','Birkir','Magnus',
+  // African
+  'Mohamed','Sadio','Wilfried','Nicolas','Ismaila','Naby','Idrissa','Cheikhou','Kalidou','Famara',
+  'Yannick','Samuel','Emmanuel','Kelechi','Alex','Henry','Odion','Taiwo','Chisom','Okafor',
+  // Brazilian
+  'Gabriel','Roberto','Danilo','Douglas','Eder','Fabinho','Richarlison','Everton','Matheus','Vinicius',
+  'Rodrygo','Antony','Raphinha','Renan','Endrick','Wesley','Paulinho','Willian','Malcom','Helinho',
+  // Eastern European
+  'Lukasz','Wojciech','Grzegorz','Kamil','Piotr','Tomasz','Radoslav','Jakub','Ondrej','Patrik',
+  'Marek','Michal','Tomas','Jan','Petr','Pavel','Dominik','Filip','Adam','Lukas'
+];
+
+const LAST_NAMES = [
+  // English
+  'Smith','Jones','Williams','Taylor','Brown','Davies','Evans','Wilson','Thomas','Roberts',
+  'Johnson','Walker','Wright','Robinson','Thompson','White','Jackson','Harris','Martin','Wood',
+  'Lewis','Clark','Hall','Green','Turner',
+  // French
+  'Dupont','Bernard','Dubois','Leroy','Moreau','Simon','Laurent','Lefebvre','Michel','Garcia',
+  'David','Bertrand','Roux','Vincent','Fournier','Morel','Girard','Mercier','Lambert','Bonnet',
+  'Blanc','Chevallier','Henry','Colin','Perrot',
+  // Spanish
+  'García','González','Rodríguez','Fernández','López','Martínez','Sánchez','Pérez','Gómez','Jiménez',
+  'Ruiz','Hernández','Díaz','Moreno','Álvarez','Romero','Alonso','Gutiérrez','Navarro','Torres',
+  'Domínguez','Ramos','Gil','Serrano','Blanco',
+  // Portuguese
+  'Silva','Santos','Ferreira','Pereira','Oliveira','Costa','Rodrigues','Martins','Sousa','Fernandes',
+  'Gonçalves','Gomes','Lopes','Marques','Alves','Correia','Mendes','Nunes','Carvalho','Monteiro',
+  'Moreira','Rocha','Ribeiro','Pinto','Cardoso',
+  // Dutch
+  'de Jong','van Dijk','Depay','Dumfries','Timber','Gravenberch','Wijnaldum','van Persie','Robben','Sneijder',
+  'Kuyt','Blind','Strootman','Huntelaar','Bergkamp','Seedorf','Davids','Kluivert','Overmars','van Nistelrooy',
+  'Gullit','Rijkaard','van Basten','de Bruyne','Promes',
+  // German
+  'Müller','Schmidt','Schneider','Fischer','Weber','Meyer','Wagner','Becker','Schulz','Hoffmann',
+  'Koch','Bauer','Richter','Klein','Wolf','Schröder','Kroos','Kimmich','Neuer','Boateng',
+  'Goretzka','Gnabry','Havertz','Werner','Brandt',
+  // Scandinavian
+  'Hansen','Nielsen','Jensen','Pedersen','Andersen','Christensen','Larsen','Sørensen','Rasmussen','Petersen',
+  'Jørgensen','Madsen','Kristensen','Olsen','Thomsen','Eriksen','Haaland','Thorsby','Berge','Ryerson',
+  'Meling','Bjørkan','Ajer','Lindström','Kulusevski',
+  // African
+  'Diallo','Traoré','Koné','Coulibaly','Touré','Diarra','Keita','Kouyaté','Ndoye','Niang',
+  'Sarr','Mané','Diedhiou','Sow','Mbaye','Fall','Cissé','Ba','Koulibaly','Sissoko',
+  'Sakho','Coman','Maiga','Camara','Diop',
+  // Brazilian
+  'Silva','Santos','Oliveira','Souza','Lima','Costa','Almeida','Barbosa','Cavalcanti','Nascimento',
+  'Carvalho','Gomes','Marques','Teixeira','Freitas','Ramos','Braga','Cunha','Moura','Palhinha',
+  'Firmino','Coutinho','Willian','Hulk','Robinho',
+  // Eastern European
+  'Kowalski','Nowak','Wójcik','Kamiński','Lewandowski','Zieliński','Szymański','Woźniak','Dąbrowski','Novák',
+  'Dvořák','Procházka','Horáček','Svoboda','Blažek','Souček','Coufal','Havel','Krejčí','Pokorný',
+  'Navrátil','Kratochvíl','Janda','Mašek','Duda'
+];
+
+function strToSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++)
+    h = Math.imul(h ^ str.charCodeAt(i), 2654435761);
+  return h >>> 0;
+}
+
+function makeRng(seed) {
+  let s = seed;
+  return () => { s = Math.imul(s, 1664525) + 1013904223; return (s >>> 0) / 4294967296; };
+}
+
 function generateScorers(teams) {
-  const initials = 'ABCDEFGHJKLMNOPRSTV'.split('');
-  const surnames = [
-    'Hansen', 'Nielsen', 'Jensen', 'Pedersen', 'Andersen',
-    'Christensen', 'Larsen', 'Sørensen', 'Rasmussen', 'Petersen',
-    'Jørgensen', 'Madsen', 'Kristensen', 'Olsen', 'Thomsen',
-    'Poulsen', 'Johansen', 'Berg', 'Møller', 'Kjær'
-  ];
   const scorers = [];
   for (const team of teams) {
-    const count = 2 + Math.floor(Math.random() * 2); // 2 or 3 per team
+    const rng = makeRng(strToSeed(team.id));
+    const count = 2 + Math.floor(rng() * 2); // 2 or 3
     for (let i = 0; i < count; i++) {
-      const initial = initials[Math.floor(Math.random() * initials.length)];
-      const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      scorers.push({ name: `${initial}. ${surname}`, teamId: team.id, goals: 0 });
+      const first = FIRST_NAMES[Math.floor(rng() * FIRST_NAMES.length)];
+      const last  = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)];
+      scorers.push({ name: `${first} ${last}`, teamId: team.id, goals: 0, assists: 0 });
     }
   }
   return scorers;
@@ -340,6 +422,7 @@ async function init() {
   if (saved) {
     try {
       state = JSON.parse(saved);
+      state.scorers = state.scorers.map(s => ({ assists: 0, ...s }));
     } catch {
       localStorage.removeItem('magnes-liga');
       const teams = await loadTeams();
