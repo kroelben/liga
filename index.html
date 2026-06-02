@@ -716,6 +716,12 @@ function randomScorer(teamId) {
   return pool[Math.floor(Math.random() * pool.length)].name;
 }
 
+function randomScorerExcluding(teamId, excludeName) {
+  const pool = state.scorers.filter(s => s.teamId === teamId && s.name !== excludeName);
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)].name;
+}
+
 function generateEvents(fixture, homeGoals, awayGoals) {
   const events = [];
   const usedMinutes = new Set();
@@ -725,10 +731,16 @@ function generateEvents(fixture, homeGoals, awayGoals) {
     usedMinutes.add(m);
     return m;
   }
-  for (let i = 0; i < homeGoals; i++)
-    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.homeId, playerName: randomScorer(fixture.homeId) });
-  for (let i = 0; i < awayGoals; i++)
-    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.awayId, playerName: randomScorer(fixture.awayId) });
+  for (let i = 0; i < homeGoals; i++) {
+    const scorer = randomScorer(fixture.homeId);
+    const assist = Math.random() < 0.75 ? randomScorerExcluding(fixture.homeId, scorer) : null;
+    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.homeId, playerName: scorer, assist });
+  }
+  for (let i = 0; i < awayGoals; i++) {
+    const scorer = randomScorer(fixture.awayId);
+    const assist = Math.random() < 0.75 ? randomScorerExcluding(fixture.awayId, scorer) : null;
+    events.push({ minute: randMinute(), type: 'goal', teamId: fixture.awayId, playerName: scorer, assist });
+  }
   const chanceCount = 2 + Math.floor(Math.random() * 3);
   for (let i = 0; i < chanceCount; i++)
     events.push({ minute: randMinute(), type: 'chance', teamId: Math.random() < 0.5 ? fixture.homeId : fixture.awayId, playerName: null });
@@ -753,6 +765,10 @@ function applyResult(fixture, homeGoals, awayGoals, events) {
     if (ev.type === 'goal' && ev.playerName) {
       const scorer = state.scorers.find(s => s.teamId === ev.teamId && s.name === ev.playerName);
       if (scorer) scorer.goals++;
+    }
+    if (ev.type === 'goal' && ev.assist) {
+      const assister = state.scorers.find(s => s.teamId === ev.teamId && s.name === ev.assist);
+      if (assister) assister.assists++;
     }
   }
   state.results.push({ matchday: fixture.matchday, homeId: fixture.homeId, awayId: fixture.awayId, homeGoals, awayGoals });
