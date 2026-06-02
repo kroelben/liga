@@ -219,12 +219,6 @@
     font-family: inherit; margin-bottom: 12px; flex-shrink: 0;
   }
   #md-primary-btn:disabled { background: #1e1e2a; color: #333; cursor: default; }
-  #md-skip-btn {
-    width: 100%; padding: 14px;
-    background: transparent; color: #444; font-size: 13px;
-    border: 1px solid #1e1e2a; border-radius: 12px; cursor: pointer;
-    font-family: inherit; flex-shrink: 0;
-  }
   #md-dismiss-btn {
     position: absolute; top: 14px; right: 16px;
     background: transparent; border: none; color: #555;
@@ -911,8 +905,7 @@ function showMatch(index) {
   document.getElementById('md-home-score').textContent = '0';
   document.getElementById('md-away-score').textContent = '0';
   mdClearEvent();
-  document.getElementById('md-skip-btn').style.display = 'none';
-  document.getElementById('md-primary-btn').textContent = 'Spark af →';
+  document.getElementById('md-primary-btn').textContent = 'Start →';
   document.getElementById('md-primary-btn').disabled = false;
   mdState.matchIndex = index;
   mdState.pendingKickoff = true;
@@ -922,7 +915,6 @@ function mdPrimaryAction() {
   if (mdState.pendingKickoff) {
     mdState.pendingKickoff = false;
     document.getElementById('md-primary-btn').disabled = true;
-    document.getElementById('md-skip-btn').style.display = 'block';
     playEvents(mdState.matchResults[mdState.matchIndex].events,
                mdState.matchResults[mdState.matchIndex].fixture);
   } else {
@@ -940,7 +932,6 @@ function playEvents(events, fixture) {
   function tick() {
     if (!mdState) return;
     if (i >= events.length) {
-      document.getElementById('md-skip-btn').style.display = 'none';
       const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
       document.getElementById('md-primary-btn').textContent = isLast ? 'Luk' : 'Næste kamp →';
       document.getElementById('md-primary-btn').disabled = false;
@@ -973,7 +964,6 @@ function mdSkip() {
   document.getElementById('md-home-score').textContent = homeGoals;
   document.getElementById('md-away-score').textContent = awayGoals;
   mdClearEvent();
-  document.getElementById('md-skip-btn').style.display = 'none';
   const isLast = mdState.matchIndex + 1 >= mdState.matchResults.length;
   document.getElementById('md-primary-btn').textContent = isLast ? 'Luk' : 'Næste kamp →';
   document.getElementById('md-primary-btn').disabled = false;
@@ -1062,7 +1052,6 @@ document.addEventListener('DOMContentLoaded', () =>
       <div id="md-event-detail"></div>
     </div>
     <button id="md-primary-btn" onclick="mdPrimaryAction()"></button>
-    <button id="md-skip-btn" onclick="mdSkip()" style="display:none">Spring til resultat</button>
   </div>
 </div>
 </body>
