@@ -284,22 +284,26 @@ async function loadTeams() {
   }));
 }
 
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function generateFixtures(teams) {
-  const ids = teams.map(t => t.id);
+  const ids = shuffle([...teams]).map(t => t.id);
   const n = ids.length; // 20
-  const rotate = ids.slice(1); // ids[0] is the fixed pivot
+  const rotate = ids.slice(1);
   const firstHalf = [];
 
   for (let round = 0; round < n - 1; round++) {
     const circle = [ids[0], ...rotate];
     for (let i = 0; i < n / 2; i++) {
-      firstHalf.push({
-        matchday: round + 1,
-        homeId: circle[i],
-        awayId: circle[n - 1 - i]
-      });
+      firstHalf.push({ matchday: round + 1, homeId: circle[i], awayId: circle[n - 1 - i] });
     }
-    rotate.unshift(rotate.pop()); // rotate right
+    rotate.unshift(rotate.pop());
   }
 
   const secondHalf = firstHalf.map(f => ({
@@ -308,7 +312,12 @@ function generateFixtures(teams) {
     awayId: f.homeId
   }));
 
-  return [...firstHalf, ...secondHalf];
+  const all = [...firstHalf, ...secondHalf];
+  const byMatchday = {};
+  for (const f of all) {
+    (byMatchday[f.matchday] ??= []).push(f);
+  }
+  return Object.values(byMatchday).flatMap(matches => shuffle(matches));
 }
 
 const FIRST_NAMES = [
