@@ -384,9 +384,14 @@ function render() {
       : 'Season 1 · Pre-season';
   const simBtn = document.getElementById('simulate-btn');
   if (simBtn) {
-    const next = state.currentMatchday + 1;
-    simBtn.textContent = next <= 38 ? `Simulate matchday ${next}` : 'Season complete';
-    simBtn.disabled = state.currentMatchday >= 38;
+    if (mdState) {
+      simBtn.textContent = `Resume matchday ${state.currentMatchday}`;
+      simBtn.disabled = false;
+    } else {
+      const next = state.currentMatchday + 1;
+      simBtn.textContent = next <= 38 ? `Simulate matchday ${next}` : 'Season complete';
+      simBtn.disabled = state.currentMatchday >= 38;
+    }
   }
   if (activeTab === 'standings') renderStandings();
   else if (activeTab === 'fixtures') renderFixtures();
@@ -671,6 +676,7 @@ function applyResult(fixture, homeGoals, awayGoals, events) {
 }
 
 async function simulateMatchday() {
+  if (mdState) { mdResume(); return; }
   const nextMatchday = state.currentMatchday + 1;
   if (nextMatchday > 38) return;
   state.currentMatchday = nextMatchday;
@@ -800,8 +806,7 @@ function mdClose() {
   if (mdState && mdState.eventTimer) clearTimeout(mdState.eventTimer);
   mdState = null;
   document.getElementById('md-modal').style.display = 'none';
-  const simBtn = document.getElementById('simulate-btn');
-  if (simBtn) simBtn.disabled = state.currentMatchday >= 38;
+  render();
 }
 
 function mdDismiss() {
