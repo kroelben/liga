@@ -597,7 +597,7 @@ function standingsTableHTML(rankedTeams, showForm) {
       ? `<td>${renderFormBadges(team.id)}</td>`
       : `<td></td>`;
     return `
-      <tr class="zone-${zone}">
+      <tr class="zone-${zone}" onclick="openTeamModal('${team.id}')">
         <td><span class="rank-badge rank-${zone}">${rank}</span></td>
         <td class="col-team">
           <div class="team-cell">
