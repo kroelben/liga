@@ -819,8 +819,7 @@ function mdDismiss() {
 function mdResume() {
   if (!mdState) return;
   document.getElementById('md-modal').style.display = 'flex';
-  const simBtn = document.getElementById('simulate-btn');
-  if (simBtn) simBtn.disabled = true;
+  render();
 }
 
 async function resetLeague() {
