@@ -804,6 +804,20 @@ function mdClose() {
   if (simBtn) simBtn.disabled = state.currentMatchday >= 38;
 }
 
+function mdDismiss() {
+  if (!mdState) return;
+  if (mdState.eventTimer) mdSkip();
+  document.getElementById('md-modal').style.display = 'none';
+  render();
+}
+
+function mdResume() {
+  if (!mdState) return;
+  document.getElementById('md-modal').style.display = 'flex';
+  const simBtn = document.getElementById('simulate-btn');
+  if (simBtn) simBtn.disabled = true;
+}
+
 async function resetLeague() {
   if (mdState) mdClose();
   if (!confirm('Reset the league? All progress will be cleared.')) return;
@@ -834,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () =>
 
 <div id="md-modal" style="display:none">
   <div id="md-card">
+    <button id="md-dismiss-btn" onclick="mdDismiss()">×</button>
     <div id="md-header"></div>
     <div id="md-teams">
       <div class="md-team">
