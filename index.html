@@ -278,7 +278,8 @@ async function loadTeams() {
     logoFile: `${t.id}.png`,
     strength: Math.floor(Math.random() * 10) + 1,
     played: 0, won: 0, drawn: 0, lost: 0,
-    gf: 0, ga: 0, points: 0
+    gf: 0, ga: 0, points: 0,
+    stadiumName: '', capacity: '', forsvar: '', kontrol: '', angreb: ''
   }));
 }
 
@@ -429,6 +430,10 @@ async function init() {
   if (saved) {
     try {
       state = JSON.parse(saved);
+      state.teams = state.teams.map(t => ({
+        stadiumName: '', capacity: '', forsvar: '', kontrol: '', angreb: '',
+        ...t
+      }));
       state.scorers = state.scorers.map(s => ({ assists: 0, ...s }));
       // Migrate old abbreviated names ("S. Berg") to full international names
       if (state.scorers.length > 0 && /^[A-Z]\. /.test(state.scorers[0].name)) {
