@@ -1066,7 +1066,7 @@ function openTeamModal(teamId) {
   document.getElementById('tp-shirt').src = `/shirts/${team.id}.png`;
   document.getElementById('tp-shirt').alt = team.name;
   document.getElementById('tp-stadium').value = team.stadiumName ?? '';
-  document.getElementById('tp-capacity').value = team.capacity ?? '';
+  document.getElementById('tp-capacity').value = team.capacity !== '' && team.capacity != null ? Number(team.capacity).toLocaleString('da-DK') : '';
   document.getElementById('tp-forsvar').value = team.forsvar ?? '';
   document.getElementById('tp-kontrol').value = team.kontrol ?? '';
   document.getElementById('tp-angreb').value = team.angreb ?? '';
@@ -1083,7 +1083,7 @@ const NUMERIC_TEAM_FIELDS = new Set(['capacity', 'forsvar', 'kontrol', 'angreb']
 function teamModalSave(field, value) {
   if (!tpTeamId) return;
   const team = state.teams.find(t => t.id === tpTeamId);
-  team[field] = NUMERIC_TEAM_FIELDS.has(field) ? (value === '' ? '' : Number(value)) : value;
+  team[field] = NUMERIC_TEAM_FIELDS.has(field) ? (value === '' ? '' : Number(value.replace(/\./g, ''))) : value;
   saveState();
 }
 
@@ -1158,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () =>
         </div>
         <div class="tp-field">
           <div class="tp-label">Kapacitet</div>
-          <input class="tp-input" id="tp-capacity" type="number" placeholder="Kapacitet"
+          <input class="tp-input" id="tp-capacity" type="text" inputmode="numeric" placeholder="Kapacitet"
             oninput="teamModalSave('capacity', this.value)">
         </div>
       </div>
