@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -571,7 +571,7 @@ function standingsTableHTML(rankedTeams, showForm) {
           <th class="col-team">Hold</th>
           <th>K</th><th>V</th><th>U</th><th>T</th>
           <th>MÅL</th><th>DIFF</th>
-          <th>Form</th>
+          ${showForm ? '<th>Form</th>' : ''}
           <th>P</th>
         </tr>
       </thead>
@@ -709,6 +709,7 @@ function computeFormStandings() {
     if (b.points !== a.points) return b.points - a.points;
     const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
     if (gdDiff !== 0) return gdDiff;
+    if (b.gf !== a.gf) return b.gf - a.gf;
     return a.name.localeCompare(b.name);
   });
 }
@@ -785,100 +786,6 @@ function renderKampe() {
 
   window.updateKampeMatchday = md => {
     document.getElementById('kampe-content').innerHTML = buildMatchdayHTML(Number(md));
-  };
-}
-
-function renderResults() {
-  if (state.results.length === 0) {
-    document.getElementById('tab-results').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <p>Ingen resultater endnu. Simuler en runde for at se resultater her.</p>
-      </div>`;
-    return;
-  }
-
-  const matchdays = [...new Set(state.results.map(r => r.matchday))].sort((a, b) => b - a);
-  const latest = matchdays[0];
-
-  function buildResultsHTML(matchday) {
-    const matches = state.results.filter(r => r.matchday === matchday);
-    return `<div class="results-grid">${matches.map(r => {
-      const home = state.teams.find(t => t.id === r.homeId) ?? { logoFile: '', name: 'Unknown' };
-      const away = state.teams.find(t => t.id === r.awayId) ?? { logoFile: '', name: 'Unknown' };
-      return `
-        <div class="result-card">
-          <div class="result-team">
-            <img class="team-logo" src="./logos/${home.logoFile}" alt="${esc(home.name)}">
-            <span class="result-team-name">${esc(home.name)}</span>
-          </div>
-          <span class="result-score">${r.homeGoals}–${r.awayGoals}</span>
-          <div class="result-team away">
-            <img class="team-logo" src="./logos/${away.logoFile}" alt="${esc(away.name)}">
-            <span class="result-team-name">${esc(away.name)}</span>
-          </div>
-        </div>`;
-    }).join('')}</div>`;
-  }
-
-  const options = matchdays.map(md =>
-    `<option value="${md}" ${md === latest ? 'selected' : ''}>Runde ${md}</option>`
-  ).join('');
-
-  document.getElementById('tab-results').innerHTML = `
-    <div class="results-controls">
-      <div class="section-label" style="margin:0">Runde</div>
-      <select class="matchday-select" id="results-select" onchange="updateResultsMatchday(this.value)">
-        ${options}
-      </select>
-    </div>
-    <div id="results-content">${buildResultsHTML(latest)}</div>`;
-
-  window.updateResultsMatchday = md => {
-    document.getElementById('results-content').innerHTML = buildResultsHTML(Number(md));
-  };
-}
-
-function renderFixtures() {
-  const allMatchdays = [...new Set(state.fixtures.map(f => f.matchday))].sort((a, b) => a - b);
-  const nextUnplayed = allMatchdays.find(md => md > state.currentMatchday) ?? allMatchdays[allMatchdays.length - 1];
-
-  function buildMatchdayHTML(matchday) {
-    const matches = state.fixtures.filter(f => f.matchday === matchday);
-    const isPast = matchday <= state.currentMatchday;
-    return `<div class="fixtures-grid">${matches.map(f => {
-      const home = state.teams.find(t => t.id === f.homeId) ?? { logoFile: '', name: 'Unknown' };
-      const away = state.teams.find(t => t.id === f.awayId) ?? { logoFile: '', name: 'Unknown' };
-      return `
-        <div class="fixture-card" style="${isPast ? 'opacity:0.45;' : ''}">
-          <div class="fixture-team">
-            <img class="team-logo" src="./logos/${home.logoFile}" alt="${esc(home.name)}">
-            <span class="fixture-team-name">${esc(home.name)}</span>
-          </div>
-          <span class="fixture-vs">vs</span>
-          <div class="fixture-team away">
-            <img class="team-logo" src="./logos/${away.logoFile}" alt="${esc(away.name)}">
-            <span class="fixture-team-name">${esc(away.name)}</span>
-          </div>
-        </div>`;
-    }).join('')}</div>`;
-  }
-
-  const options = allMatchdays.map(md =>
-    `<option value="${md}" ${md === nextUnplayed ? 'selected' : ''}>Runde ${md}</option>`
-  ).join('');
-
-  document.getElementById('tab-fixtures').innerHTML = `
-    <div class="fixtures-controls">
-      <div class="section-label" style="margin:0">Runde</div>
-      <select class="matchday-select" id="fixture-select" onchange="updateFixtureMatchday(this.value)">
-        ${options}
-      </select>
-    </div>
-    <div id="fixture-content">${buildMatchdayHTML(nextUnplayed)}</div>`;
-
-  window.updateFixtureMatchday = md => {
-    document.getElementById('fixture-content').innerHTML = buildMatchdayHTML(Number(md));
   };
 }
 
