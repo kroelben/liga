@@ -30,7 +30,7 @@ npm start     # http://localhost:3000
 
 ```js
 {
-  teams:    [{ id, name, logoFile, strength, played, won, drawn, lost, gf, ga, points }],
+  teams:    [{ id, name, logoFile, strength, played, won, drawn, lost, gf, ga, points, stadiumName, capacity, forsvar, kontrol, angreb }],
   fixtures: [{ matchday, homeId, awayId }],          // 380 total (38 × 10)
   results:  [{ matchday, homeId, awayId, homeGoals, awayGoals }],
   scorers:  [{ name, teamId, goals, assists }],       // ~50–60 total
