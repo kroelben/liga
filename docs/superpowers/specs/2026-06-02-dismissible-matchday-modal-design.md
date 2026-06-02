@@ -50,9 +50,7 @@ New function called by the `×` button:
 
 ### 5. Resume
 
-Clicking "Resume matchday X" calls `openMatchdayModal()` passing the existing `mdState.matchResults`. Since `mdState` is still populated, the modal re-opens at `matchIndex` with the correct scores and the primary button ready ("Next match →" or "Close").
-
-`openMatchdayModal()` is adjusted to accept optional existing state: if `mdState` already exists (resume path), skip re-initialising `matchIndex` and `pendingKickoff` and simply re-show the modal.
+Clicking "Resume matchday X" calls a new `mdResume()` function, which simply re-shows the modal overlay (`style.display = 'flex'`) and disables the simulate button again. `mdState` is already intact — `matchIndex`, scores, and the primary button text are all as they were when the modal was dismissed. `openMatchdayModal()` is unchanged.
 
 ### 6. Natural close
 
@@ -62,7 +60,7 @@ After the final match the user clicks **Close**, which calls `mdClose()` as toda
 
 | File | Changes |
 |---|---|
-| `index.html` | CSS: resize `#md-card`, add `×` button styles. HTML: add `#md-dismiss-btn` inside `#md-card`. JS: add `mdDismiss()`, adjust `openMatchdayModal()` for resume path, update `render()` to show Resume button when `mdState !== null` |
+| `index.html` | CSS: resize `#md-card`, add `×` button styles. HTML: add `#md-dismiss-btn` inside `#md-card`. JS: add `mdDismiss()`, add `mdResume()`, update `render()` to show Resume button when `mdState !== null` |
 
 ## Out of scope
 
