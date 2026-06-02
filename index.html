@@ -671,7 +671,39 @@ function renderUde() {
     <div class="section-label">Udekampe</div>
     ${standingsTableHTML(sorted, false)}`;
 }
-function renderForm() {}
+
+function computeFormStandings() {
+  return state.teams.map(team => {
+    const recent = state.results
+      .filter(r => r.homeId === team.id || r.awayId === team.id)
+      .sort((a, b) => b.matchday - a.matchday)
+      .slice(0, 5);
+    let played = 0, won = 0, drawn = 0, lost = 0, gf = 0, ga = 0, points = 0;
+    for (const r of recent) {
+      const isHome = r.homeId === team.id;
+      const scored = isHome ? r.homeGoals : r.awayGoals;
+      const conceded = isHome ? r.awayGoals : r.homeGoals;
+      played++;
+      gf += scored; ga += conceded;
+      if (scored > conceded)       { won++;   points += 3; }
+      else if (scored === conceded) { drawn++; points += 1; }
+      else                          { lost++; }
+    }
+    return { ...team, played, won, drawn, lost, gf, ga, points };
+  }).sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    const gdDiff = (b.gf - b.ga) - (a.gf - a.ga);
+    if (gdDiff !== 0) return gdDiff;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function renderForm() {
+  const sorted = computeFormStandings();
+  document.getElementById('tab-form').innerHTML = `
+    <div class="section-label">Form — seneste 5 kampe</div>
+    ${standingsTableHTML(sorted, true)}`;
+}
 function renderKampe() {}
 
 function renderResults() {
