@@ -251,21 +251,25 @@
   </div>
 
   <div class="tabs">
-    <div class="tab active" data-tab="standings" onclick="switchTab('standings')">Standings</div>
-    <div class="tab" data-tab="results" onclick="switchTab('results')">Results</div>
-    <div class="tab" data-tab="fixtures" onclick="switchTab('fixtures')">Fixtures</div>
-    <div class="tab" data-tab="stats" onclick="switchTab('stats')">Stats</div>
+    <div class="tab active" data-tab="stilling"  onclick="switchTab('stilling')">Stilling</div>
+    <div class="tab"        data-tab="hjemme"    onclick="switchTab('hjemme')">Hjemme</div>
+    <div class="tab"        data-tab="ude"       onclick="switchTab('ude')">Ude</div>
+    <div class="tab"        data-tab="form"      onclick="switchTab('form')">Form</div>
+    <div class="tab"        data-tab="kampe"     onclick="switchTab('kampe')">Kampe</div>
+    <div class="tab"        data-tab="statistik" onclick="switchTab('statistik')">Statistik</div>
   </div>
 
-  <div id="tab-standings" class="tab-content active"></div>
-  <div id="tab-results" class="tab-content"></div>
-  <div id="tab-fixtures" class="tab-content"></div>
-  <div id="tab-stats" class="tab-content"></div>
+  <div id="tab-stilling"  class="tab-content active"></div>
+  <div id="tab-hjemme"    class="tab-content"></div>
+  <div id="tab-ude"       class="tab-content"></div>
+  <div id="tab-form"      class="tab-content"></div>
+  <div id="tab-kampe"     class="tab-content"></div>
+  <div id="tab-statistik" class="tab-content"></div>
 </div>
 
 <script>
 let state = {};
-let activeTab = 'standings';
+let activeTab = 'stilling';
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -485,10 +489,12 @@ function render() {
       simBtn.disabled = state.currentMatchday >= 38;
     }
   }
-  if (activeTab === 'standings') renderStandings();
-  else if (activeTab === 'fixtures') renderFixtures();
-  else if (activeTab === 'results') renderResults();
-  else if (activeTab === 'stats') renderStats();
+  if      (activeTab === 'stilling')  renderStandings();
+  else if (activeTab === 'hjemme')    renderHjemme();
+  else if (activeTab === 'ude')       renderUde();
+  else if (activeTab === 'form')      renderForm();
+  else if (activeTab === 'kampe')     renderKampe();
+  else if (activeTab === 'statistik') renderStats();
 }
 
 function getZone(rank) {
@@ -582,7 +588,7 @@ function renderStandings() {
     return a.name.localeCompare(b.name);
   });
 
-  document.getElementById('tab-standings').innerHTML = `
+  document.getElementById('tab-stilling').innerHTML = `
     <div class="section-label">
       ${state.currentMatchday > 0 ? `Runde ${state.currentMatchday} af 38` : 'Før sæsonen'}
     </div>
@@ -612,7 +618,7 @@ function renderStats() {
       </tr>`;
   }).join('');
 
-  document.getElementById('tab-stats').innerHTML = `
+  document.getElementById('tab-statistik').innerHTML = `
     <div class="section-label">Topscorere</div>
     <table class="stats-table">
       <thead>
